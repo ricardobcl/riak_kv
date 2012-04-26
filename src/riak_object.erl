@@ -36,7 +36,7 @@
 -type value() :: term().
 
 -record(r_content, {
-          metadata :: dict(),
+          metadata :: dict(), 
           value :: term(),
           dvvclock :: dottedvv:dottedvv()
          }).
