@@ -417,10 +417,13 @@ from_json(Obj) ->
 
 jsonify_metadata(MD) ->
     MDJS = fun({LastMod, Now={_,_,_}}) ->
-                                                % convert Now to JS-readable time string
+                   %% convert Now to JS-readable time string
                    {LastMod, list_to_binary(
                                httpd_util:rfc1123_date(
                                  calendar:now_to_local_time(Now)))};
+              %% When the user metadata is empty, it should still be a struct
+              ({?MD_USERMETA, []}) ->
+                   {?MD_USERMETA, {struct, []}};
               ({<<"Links">>, Links}) ->
                    {<<"Links">>, [ [B, K, T] || {{B, K}, T} <- Links ]};
               ({Name, List=[_|_]}) ->
@@ -478,7 +481,7 @@ dejsonify_values([{<<"metadata">>, {struct, MD0}},
                             <<"Links">> ->
                                 {Key, [{{B, K}, Tag} || [B, K, Tag] <- Val]};
                             <<"X-Riak-Last-Modified">> ->
-                                {Key, erlang:now()};
+                                {Key, os:timestamp()};
                             _ ->
                                 {Key, if
                                           is_binary(Val) ->
