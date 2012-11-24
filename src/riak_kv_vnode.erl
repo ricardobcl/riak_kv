@@ -705,17 +705,17 @@ prepare_put(#state{vnodeid=VId,
                         false ->
                             IndexSpecs = []
                     end,
-                    case PruneTime of
-                        undefined ->
-                            ObjToStore = AMObj;
-                        _ ->
-                            ObjToStore =
-                                riak_object:set_vclock(AMObj,
-                                                       vclock:prune(VC,
-                                                                    PruneTime,
-                                                                    BProps))
-                    end,
-                    {{true, ObjToStore},
+%                    case PruneTime of
+%                        undefined ->
+%                            ObjToStore = AMObj;
+%                        _ ->
+%                            ObjToStore =
+%                                riak_object:set_vclock(AMObj,
+%                                                       vclock:prune(VC,
+%                                                                    PruneTime,
+%                                                                    BProps))
+%                    end,
+                    {{true, AMObj},
                      PutArgs#putargs{index_specs=IndexSpecs, is_index=IndexBackend}}
             end
     end.
