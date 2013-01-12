@@ -127,10 +127,17 @@ final(PutCore = #putcore{final_obj = FinalObj,
                            [] ->
                                undefined;
                            _ ->
-                               riak_object:reconcile(RObjs, AllowMult)
+                               Res = riak_object:reconcile(RObjs, AllowMult),
+                               file:write_file("/home/gsd/tome/riak-new/nsiblings.txt",lists:flatten(io_lib:format("~p~n",[riak_object:value_count(Res)])),[append]),
+                               Size = size(term_to_binary(riak_object:vclock(Res))),
+                               file:write_file("/home/gsd/tome/riak-new/size_dvv.txt",lists:flatten(io_lib:format("~p~n",[Size])),[append]),
+                               Res
                        end,
             {ReplyObj, PutCore#putcore{final_obj = ReplyObj}};
         _ ->
+            file:write_file("/home/gsd/tome/riak-new/nsiblings.txt",lists:flatten(io_lib:format("~p~n",[riak_object:value_count(FinalObj)])),[append]),
+            Size = size(term_to_binary(riak_object:vclock(FinalObj))),
+            file:write_file("/home/gsd/tome/riak-new/size_dvv.txt",lists:flatten(io_lib:format("~p~n",[Size])),[append]),
             {FinalObj, PutCore}
     end.
 
@@ -147,7 +154,13 @@ result_idx(_)              -> -1.
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
-maybe_return_body(PutCore = #putcore{returnbody = false}) ->
+maybe_return_body(PutCore = #putcore{final_obj = FinalObj, returnbody = false}) ->
+    case FinalObj of
+        undefined -> true;
+        _ -> file:write_file("/home/gsd/tome/riak-new/nsiblings.txt",lists:flatten(io_lib:format("~p~n",[riak_object:value_count(FinalObj)])),[append]),
+          Size = size(term_to_binary(riak_object:vclock(FinalObj))),
+          file:write_file("/home/gsd/tome/riak-new/size_dvv.txt",lists:flatten(io_lib:format("~p~n",[Size])),[append])
+    end,
     {ok, PutCore};
 maybe_return_body(PutCore = #putcore{returnbody = true}) ->
     {ReplyObj, UpdPutCore} = final(PutCore),
