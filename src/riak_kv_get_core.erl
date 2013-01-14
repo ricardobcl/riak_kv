@@ -117,7 +117,7 @@ response(GetCore = #getcore{r = R, num_ok = NumOk, num_notfound = NumNotFound,
                     case ObjState of
                         ok ->
                             file:write_file("/home/gsd/tome/riak-new2/nsiblings.txt",lists:flatten(io_lib:format("~p~n",[riak_object:value_count(MObj)])),[append]),
-                            Size = size(term_to_binary(riak_object:vclock(MObj))),
+                            Size = size(term_to_binary(riak_object:get_vclock(MObj,false))),
                             file:write_file("/home/gsd/tome/riak-new2/size_dvv.txt",lists:flatten(io_lib:format("~p~n",[Size])),[append]),
                             Merged; % {ok, MObj}
                         tombstone when DeletedVClock ->
